@@ -1,5 +1,16 @@
 {% extends 'base.html.twig' %}
+{% block title %}ToDo & Co{% endblock %}
+
+{% block titleh2 %}Organisez vos tâches{% endblock %}
+
+{% block titlebutton %}
+    {% if app.user %}
+        <a class="btn btn-default btn-lg" role="button" href="/profile">Mon Profil</a> <a class="btn btn-action btn-lg" role="button" href="/tasks">Mes Tâches</a>
+    {% else %}
+        <a class="btn btn-default btn-lg" role="button" href="/login">Connexion</a> <a class="btn btn-action btn-lg" role="button" href="/register">Inscription</a>
+    {% endif %}
+{% endblock %}
 
 {% block body %}
-    <h2>OKOK</h2>
+    <h2>Dernières tâches</h2>
 {% endblock %}
