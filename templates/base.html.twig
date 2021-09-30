@@ -45,9 +45,15 @@
 						<a href="#" class="dropdown-toggle" data-toggle="dropdown">Tâches <b class="caret"></b></a>
 						<ul class="dropdown-menu">
 							<li><a href="/tasks">Mes Tâches</a></li>
-							<li class="active"><a href="/tasks/new">Nouvelle Tâche</a></li>
+							<li><a href="/tasks/new">Nouvelle Tâche</a></li>
+							{% if is_granted('ROLE_ADMIN') %} 
+							<li><a href="/admin_tasks">Gestion des tâches</a></li> 
+							{% endif %}
 						</ul>
 					    </li>
+						{% if is_granted('ROLE_ADMIN') %} 
+						<li><a href="/admin_users">Gestion des utilisateurs</a></li> 
+						{% endif %}
                         <li><a href="/logout">Deconnexion</a></li>
                     {% else %}
                         <li><a class="btn" href="/login">Connexion</a></li>

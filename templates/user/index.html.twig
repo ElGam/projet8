@@ -1,0 +1,27 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mon Profil{% endblock %}
+
+{% block body %}
+
+<form method="post" action="/profileUpdate">
+  <div class="form-group">
+    <label for="InputEmail1">Email</label>
+    <input type="email" class="form-control" name="email" id="InputEmail1" aria-describedby="emailHelp" placeholder="Email" value="{{ app.user.email }}">
+  </div>
+  <div class="form-group">
+    <label for="InputPassword1">Mot de passe</label>
+    <input type="password" value="" name="password" class="form-control" id="InputPassword1" placeholder="Password">
+  </div>
+  <div class="form-check">
+    <label class="form-check-label" for="role">Rôle</label>
+    <select name="role" id="role">
+        <option value="user">Utilisateur</option>
+        <option value="admin" {% if app.user.roles[0] == "ROLE_ADMIN" %} selected {% endif %}>Administrateur</option>
+    </select>
+  </div><br>
+  <button type="submit" class="btn btn-primary">Modifier</button><br><br>
+</form>
+  <a href="/profileDelete_{{app.user.id}}"><button type="submit" class="btn btn-danger">Supprimer</button></a>
+
+{% endblock %}
