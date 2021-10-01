@@ -29,6 +29,26 @@ class TaskController extends AbstractController
     }
 
     /**
+     * @Route("/admin_tasks", name="admin_tasks")
+     */
+    public function adminTasks(): Response
+    {
+        $user = $this->getUser();
+        $roles = $user->getRoles();
+        if($roles[0] == "ROLE_ADMIN" || $roles[1] == "ROLE_ADMIN"){
+            $tasks = $this->getDoctrine()
+            ->getRepository(Task::class)
+            ->findAll();
+        }
+        
+        return $this->render('task/admin.html.twig', [
+            'controller_name' => 'TaskController',
+            'tasks' => $tasks,
+        ]);
+    }
+
+
+    /**
      * @Route("/task/changeTitle/{id}", name="task_change_title")
      */
     public function changeTitle(int $id)

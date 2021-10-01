@@ -1,0 +1,91 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Gestion des Tâches <br><a href="/task_new" class="btn btn-primary">Nouveau</a> {% endblock %}
+
+{% block body %}
+<div style="display:flex">
+    {% for task in tasks %}
+        <div class="card" style="width: 18rem;border: 0.5px groove black;border-radius: 6px">
+        <div class="card-body">
+            <h5 onmouseout='changeTitle({{task.id}}, this.innerText)' class="card-title" style="font-weight:bold;" id="card-title{{ task.id }}" contenteditable>{{ task.title }}</h5>
+            <h6 class="card-subtitle mb-2 text-muted">02/05/1993</h6>
+            <h6 class="card-subtitle mb-2 text-muted">{{ task.userId }}</h6>
+            <p onmouseout='changeContent({{task.id}}, this.innerText)' class="card-text" id="card-content{{ task.id }}" contenteditable>{{ task.content|nl2br }}</p>
+            {% if task.isDone %}
+                <a onClick='changeStatus({{task.id}}, 0)'  class="btn btn-success">Terminée</a><br>
+            {% else %}
+                <a onClick='changeStatus({{task.id}}, 1)'  class="btn btn-primary">A faire</a><br>
+            {% endif %}
+                 <br><a onClick='deleteTask({{task.id}})'  class="btn btn-danger">Supprimer</a><br>&nbsp;
+
+        </div>
+        </div>&nbsp;&nbsp;
+    {% endfor %}
+</div>
+<script>
+function changeContent(id_task, text){
+    var xhttp = new XMLHttpRequest();
+    xhttp.open("POST", "/task/changeContent/" +id_task, true); 
+    xhttp.setRequestHeader("Content-Type", "application/json");
+    xhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+        // Response
+        var response = this.responseText;
+        console.log(response);
+    }
+    };
+    var data = {content:text};
+    xhttp.send(JSON.stringify(data));
+}
+
+function changeTitle(id_task, text){
+    var xhttp = new XMLHttpRequest();
+    xhttp.open("POST", "/task/changeTitle/" +id_task, true); 
+    xhttp.setRequestHeader("Content-Type", "application/json");
+    xhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+        // Response
+        var response = this.responseText;
+        console.log(response);
+    }
+    };
+    var data = {title:text};
+    xhttp.send(JSON.stringify(data));
+}
+
+function changeStatus(id_task, status){
+    var xhttp = new XMLHttpRequest();
+    xhttp.open("POST", "/task/changeStatus/" +id_task, true); 
+    xhttp.setRequestHeader("Content-Type", "application/json");
+    xhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+        // Response
+        var response = this.responseText;
+        console.log(response);
+        document.location.href = document.location.href;
+    }
+    };
+    var data = {status:status};
+    xhttp.send(JSON.stringify(data));
+}
+
+function deleteTask(id_task){
+    var xhttp = new XMLHttpRequest();
+    xhttp.open("POST", "/task/delete/" +id_task, true); 
+    xhttp.setRequestHeader("Content-Type", "application/json");
+    xhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+        // Response
+        var response = this.responseText;
+        console.log(response);
+        document.location.href = document.location.href;
+    }
+    };
+    var data = {id:id_task};
+    xhttp.send(JSON.stringify(data));
+}
+</script>
+{% endblock %}
+
+
+
