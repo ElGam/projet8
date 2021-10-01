@@ -37,13 +37,15 @@ class TaskRepository extends ServiceEntityRepository
     */
 
     
-    public function findById($value): ?Task
+    public function findAllByUserId($value)
     {
         return $this->createQueryBuilder('t')
-            ->andWhere('t.id = :val')
+            ->andWhere('t.user_id = :val')
             ->setParameter('val', $value)
+            ->orderBy('t.created_at', 'ASC')
+            //->setMaxResults(10)
             ->getQuery()
-            ->getOneOrNullResult()
+            ->getResult()
         ;
     }
     
