@@ -43,7 +43,6 @@ class TaskRepository extends ServiceEntityRepository
             ->andWhere('t.user_id = :val')
             ->setParameter('val', $value)
             ->orderBy('t.created_at', 'ASC')
-            //->setMaxResults(10)
             ->getQuery()
             ->getResult()
         ;

@@ -6,6 +6,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Entity\Task;
+use App\Entity\User;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use App\Form\NewTaskFormType;
@@ -34,6 +35,9 @@ class TaskController extends AbstractController
     public function adminTasks(): Response
     {
         $user = $this->getUser();
+        $users = $this->getDoctrine()
+            ->getRepository(User::class)
+            ->findAll();
         $roles = $user->getRoles();
         if($roles[0] == "ROLE_ADMIN" || $roles[1] == "ROLE_ADMIN"){
             $tasks = $this->getDoctrine()
@@ -44,6 +48,7 @@ class TaskController extends AbstractController
         return $this->render('task/admin.html.twig', [
             'controller_name' => 'TaskController',
             'tasks' => $tasks,
+            'users' => $users,
         ]);
     }
 
@@ -151,14 +156,14 @@ class TaskController extends AbstractController
         $new_task_form = $request->request->get('new_task_form');
         $title = $new_task_form['title'];
         $content = $new_task_form['content'];
-        $datetime = date("Y-m-d H:i:s");
+        $datetime = $date = new \DateTime('@'.strtotime('now'));
 
 
         $task = new Task();
         $task->setTitle($title);
         $task->setContent($content);
         $task->setUserId($user_id);
-        //$task->setCreatedAt($datetime);
+        $task->setCreatedAt($datetime);
         $task->setIsDone(0);
         $entityManager->persist($task);
         $entityManager->flush();
