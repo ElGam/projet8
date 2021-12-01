@@ -10,6 +10,7 @@ use App\Entity\User;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use App\Form\NewTaskFormType;
+use App\Services\TaskManager;
 
 class TaskController extends AbstractController
 {
@@ -56,10 +57,10 @@ class TaskController extends AbstractController
     /**
      * @Route("/task/changeTitle/{id}", name="task_change_title")
      */
-    public function changeTitle(int $id)
+    public function changeTitle(int $id, Request $request, TaskManager $taskManager)
     {
 
-        $request = Request::createFromGlobals();
+        //Récupération du titre
         $title = json_decode($request->getContent())->title;
  
         if(strlen($title) < 2){ $title = "Untitled"; }
@@ -67,8 +68,7 @@ class TaskController extends AbstractController
         $entityManager = $this->getDoctrine()->getManager();
         $task = $entityManager->getRepository(Task::class)->find($id);
 
-        $task->setTitle($title);
-        $entityManager->flush();
+        $taskManager->changeTitle($task, $title);
         
         $response = new JsonResponse(['success' => true]);
         return $response;
@@ -77,17 +77,16 @@ class TaskController extends AbstractController
     /**
      * @Route("/task/changeContent/{id}", name="task_change_content")
      */
-    public function changeContent(int $id)
+    public function changeContent(int $id, Request $request, TaskManager $taskManager)
     {
 
-        $request = Request::createFromGlobals();
         $content = json_decode($request->getContent())->content;
  
         $entityManager = $this->getDoctrine()->getManager();
         $task = $entityManager->getRepository(Task::class)->find($id);
 
-        $task->setContent($content);
-        $entityManager->flush();
+        //Service: TaskManager : ChangeStatus
+        $taskManager->changeContent($task, $content);
         
         $response = new JsonResponse(['success' => true]);
         return $response;
@@ -96,17 +95,17 @@ class TaskController extends AbstractController
     /**
      * @Route("/task/changeStatus/{id}", name="task_change_status")
      */
-    public function changeStatus(int $id)
+    public function changeStatus(int $id, Request $request, TaskManager $taskManager)
     {
 
-        $request = Request::createFromGlobals();
+        //Récupération du status
         $status = json_decode($request->getContent())->status;
  
         $entityManager = $this->getDoctrine()->getManager();
         $task = $entityManager->getRepository(Task::class)->find($id);
 
-        $task->setIsDone($status);
-        $entityManager->flush();
+        //Service: TaskManager : ChangeStatus
+        $taskManager->changeStatus($task, $status);
         
         $response = new JsonResponse(['success' => true]);
         return $response;
@@ -115,61 +114,46 @@ class TaskController extends AbstractController
     /**
      * @Route("/task/delete/{id}", name="task_delete")
      */
-    public function delete(int $id)
+    public function delete(int $id, TaskManager $taskManager)
     {
-
- 
         $entityManager = $this->getDoctrine()->getManager();
         $task = $entityManager->getRepository(Task::class)->find($id);
 
-        $entityManager->remove($task);
-        $entityManager->flush();
+        //Service: TaskManager : Delete
+        $taskManager->delete($task);
         
         $response = new JsonResponse(['success' => true]);
         return $response;
     }
 
     /**
-     * @Route("/task_new", name="task_new")
+     * @Route("/task_create", name="task_create")
      */
-    public function new()
+    public function create(Request $request, TaskManager $taskManager): Response
     {
         $task = new Task();
-        // ...
+        $user = $this->getUser();
 
+        //Récupération du formulaire
         $form = $this->createForm(NewTaskFormType::class, $task);
 
+        //Vérification des données
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $task = $form->getData();
+
+
+            //Service : TaskManager
+            $taskManager->create($task, $user->getId());
+
+            //Redirection vers route
+            return $this->redirect($this->generateUrl('tasks'));
+        }
+
+        //Redirection vers la vue
         return $this->renderForm('task/new.html.twig', [
             'form' => $form,
         ]);
-    }
-
-    /**
-     * @Route("/task_create", name="task_create")
-     */
-    public function create(Request $request)
-    {
-        $user = $this->getUser();
-        $entityManager = $this->getDoctrine()->getManager();
-        $user_id = $user->getId();
-        $request = Request::createFromGlobals();
-        $new_task_form = $request->request->get('new_task_form');
-        $title = $new_task_form['title'];
-        $content = $new_task_form['content'];
-        $datetime = $date = new \DateTime('@'.strtotime('now'));
-
-
-        $task = new Task();
-        $task->setTitle($title);
-        $task->setContent($content);
-        $task->setUserId($user_id);
-        $task->setCreatedAt($datetime);
-        $task->setIsDone(0);
-        $entityManager->persist($task);
-        $entityManager->flush();
-
-
-        return $this->redirect($this->generateUrl('tasks'));
     }
 
 }

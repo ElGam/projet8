@@ -11,6 +11,7 @@
     <php>
         <ini name="display_errors" value="1" />
         <ini name="error_reporting" value="-1" />
+        <env name="SYMFONY_DEPRECATIONS_HELPER" value="disabled" />
         <server name="APP_ENV" value="test" force="true" />
         <server name="SHELL_VERBOSITY" value="-1" />
         <server name="SYMFONY_PHPUNIT_REMOVE" value="" />
@@ -39,4 +40,19 @@
         <extension class="Symfony\Component\Panther\ServerExtension" />
     </extensions>
     -->
+
+    <filter>
+        <whitelist processUncoveredFilesFromWhitelist="true">
+            <directory suffix=".php">src</directory>
+            <exclude>
+                <file>src/Kernel.php</file>
+                <file>src/Security/UsersAuthenticator.php</file>
+                <file>src/Controller/RegistrationController.php</file>
+                <file>src/Controller/SecurityController.php</file>
+                <file>src/Controller/UserController.php</file>
+            </exclude>
+        </whitelist>
+    </filter>
+
+    
 </phpunit>

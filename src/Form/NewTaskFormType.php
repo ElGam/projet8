@@ -18,7 +18,6 @@ class NewTaskFormType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->setAction("/task_create")
             ->setMethod('POST')
             ->add('title', TextType::class, [
                 'attr' => ['class' => 'form-control'],

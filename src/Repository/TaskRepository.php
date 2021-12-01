@@ -47,5 +47,15 @@ class TaskRepository extends ServiceEntityRepository
             ->getResult()
         ;
     }
+
+    public function findOneByTitle($value): ?Task
+    {
+        return $this->createQueryBuilder('u')
+            ->andWhere('u.title = :val')
+            ->setParameter('val', $value)
+            ->getQuery()
+            ->getOneOrNullResult()
+        ;
+    }
     
 }

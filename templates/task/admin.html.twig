@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Gestion des Tâches <br><a href="/task_new" class="btn btn-primary">Nouveau</a> {% endblock %}
+{% block title %}Gestion des Tâches <br><a href="{{ path('task_create') }}" class="btn btn-primary">Nouveau</a> {% endblock %}
 
 {% block body %}
 <div style="display:flex">
