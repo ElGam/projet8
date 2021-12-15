@@ -4,6 +4,7 @@ namespace App\Tests;
 use App\Repository\UserRepository;
 use App\Repository\TaskRepository;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Symfony\Component\HttpFoundation\Response;
 
 class TaskWebTest extends WebTestCase
 {
@@ -27,23 +28,6 @@ class TaskWebTest extends WebTestCase
         $this->assertSelectorTextContains('h1', 'Mes Tâches');
     }
 
-    //Test de la page "Gestion des Tâches" en étant connecté en tant qu'Admin
-    public function testAdminTasksPageWhenLoggedAsAdmin()
-    {
-        $client = static::createClient();
-        $userRepository = static::getContainer()->get(UserRepository::class);
-
-        //Recherche du User Test (Fixture)
-        $testUser = $userRepository->findOneByEmail('admin@functional-test.fr');
-
-        //Simulation de Login
-        $client->loginUser($testUser);
-
-        //Test de la page profil
-        $client->request('GET', '/admin_tasks');
-        $this->assertResponseIsSuccessful();
-        $this->assertSelectorTextContains('h1', 'Gestion des Tâches');
-    }
 
     //Test de la page "Nouvelle Tâche" en étant connecté
     public function testNewTaskPageWhenLogged()
@@ -104,5 +88,71 @@ class TaskWebTest extends WebTestCase
     }
 
     //Test: Change Status
+    public function testChangeStatus(){
+        //Création du client
+        $client = static::createClient();
+
+        //Recherche des Fixtures
+        $taskRepository = static::getContainer()->get(TaskRepository::class);
+        $task = $taskRepository->findOneByTitle('Task 0');
+
+        //Test de la page profil
+        $client->request('POST', '/task/changeStatus/' . $task->getId(), [], [], [], json_encode(["status" => 1]));
+        $this->assertResponseIsSuccessful();
+
+        $task = $taskRepository->findOneByTitle('Task 0');
+        $this->assertEquals(1, $task->getIsDone());
+        $client->request('POST', '/task/changeStatus/' . $task->getId(), [], [], [], json_encode(["status" => 0]));
+
+    }
+
+    //Test: Administration des Tâches
+    public function testAdminTasks(){
+        //Création du client
+        $client = static::createClient();
+        $userRepository = static::getContainer()->get(UserRepository::class);
+
+        //Recherche du User Admin Test (Fixture)
+        $testUser = $userRepository->findOneByEmail('admin@functional-test.fr');
+
+        //Simulation de Login
+        $client->loginUser($testUser);
+
+        //Test de la page profil
+        $client->request('GET', '/admin_tasks');
+        $this->assertResponseIsSuccessful();
+        $this->assertSelectorTextContains('h1', 'Gestion des Tâches');
+    }
+
+    //Test: Administration des Tâches [ROLE USER]
+    public function testAdminTasksForbidden(){
+        //Création du client
+        $client = static::createClient();
+        $userRepository = static::getContainer()->get(UserRepository::class);
+
+        //Recherche du User Admin Test (Fixture)
+        $testUser = $userRepository->findOneByEmail('user0@functional-test.fr');
+
+        //Simulation de Login
+        $client->loginUser($testUser);
+
+        //Test de la page profil
+        $client->request('GET', '/admin_tasks');
+        $this->assertResponseStatusCodeSame(Response::HTTP_FORBIDDEN);
+    }
+
+    public function testDelete(){
+        //Création du client
+        $client = static::createClient();
+
+        //Recherche des Fixtures
+        $taskRepository = static::getContainer()->get(TaskRepository::class);
+        $task = $taskRepository->findOneByTitle('Task 0');
+
+        //Test de la page profil
+        $client->request('GET', '/task/delete/' . $task->getId());
+        $this->assertResponseIsSuccessful();
+        $this->assertEquals('{"success":true}', $client->getResponse()->getContent());
+    }
 
 }

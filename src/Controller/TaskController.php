@@ -7,6 +7,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Entity\Task;
 use App\Entity\User;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use App\Form\NewTaskFormType;
@@ -25,29 +26,28 @@ class TaskController extends AbstractController
             ->findAllByUserId($user->getId());
 
         return $this->render('task/index.html.twig', [
-            'controller_name' => 'TaskController',
             'tasks' => $tasks,
         ]);
     }
 
     /**
      * @Route("/admin_tasks", name="admin_tasks")
+     * @IsGranted("ROLE_ADMIN")
      */
     public function adminTasks(): Response
     {
-        $user = $this->getUser();
+    
+        //Récupération des utilisateurs
         $users = $this->getDoctrine()
             ->getRepository(User::class)
             ->findAll();
-        $roles = $user->getRoles();
-        if($roles[0] == "ROLE_ADMIN" || $roles[1] == "ROLE_ADMIN"){
-            $tasks = $this->getDoctrine()
+        
+        //Récupération des tâches    
+        $tasks = $this->getDoctrine()
             ->getRepository(Task::class)
             ->findAll();
-        }
         
         return $this->render('task/admin.html.twig', [
-            'controller_name' => 'TaskController',
             'tasks' => $tasks,
             'users' => $users,
         ]);

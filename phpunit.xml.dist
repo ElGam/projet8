@@ -50,6 +50,7 @@
                 <file>src/Controller/RegistrationController.php</file>
                 <file>src/Controller/SecurityController.php</file>
                 <file>src/Controller/UserController.php</file>
+                <file>src/Repository/UserRepository.php</file>
             </exclude>
         </whitelist>
     </filter>
