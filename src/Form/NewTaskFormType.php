@@ -28,7 +28,7 @@ class NewTaskFormType extends AbstractType
                 'label' => 'Contenu',
             ])
             ->add('save', SubmitType::class, [
-                'attr' => ['class' => 'btn btn-primary'],
+                'attr' => ['style' => 'margin-top: 12px', 'class' => 'btn btn-primary'],
                 'label' => 'Créer',
             ])
 

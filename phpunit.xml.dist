@@ -50,7 +50,10 @@
                 <file>src/Controller/RegistrationController.php</file>
                 <file>src/Controller/SecurityController.php</file>
                 <file>src/Controller/UserController.php</file>
+                <file>src/Controller/AccueilController.php</file>
+                <file>src/Form/ProfileFormType.php</file>
                 <file>src/Repository/UserRepository.php</file>
+                <directory>src/DataFixtures</directory>
             </exclude>
         </whitelist>
     </filter>

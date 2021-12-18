@@ -64,19 +64,17 @@ class UserController extends AbstractController
             $user_id = $user->getId();
             $em = $this->getDoctrine()->getManager();
             $user = $em->getRepository(User::class)->find($id); 
-            
-            if((int) $user_id == (int) $id){
                 $this->container->get('security.token_storage')->setToken(null);
                 $em->remove($user);
                 $em->flush();
                 return $this->render('accueil/index.html.twig', [
                     'controller_name' => 'UserController',
-                ]);
-            }else{
-                return $this->redirect($this->generateUrl('admin_users'));
-            }
-            
-        }        
+                ]);     
+        }else{
+            return $this->render('accueil/index.html.twig', [
+                'controller_name' => 'UserController',
+            ]);
+        }       
     }
 
     /**
